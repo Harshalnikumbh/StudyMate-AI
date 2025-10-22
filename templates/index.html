@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StudyMate-AI - Chrome AI Challenge 2025</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <span class="logo-icon">🎓</span>
+                <h1>StudyMate-AI</h1>
+            </div>
+            <p class="subtitle">Your Intelligent Study Companion Powered by Gemini Nano</p>
+        </header>
+
+        <!-- Status Banner -->
+        <div class="status-banner" id="statusBanner">
+            <span id="statusText">Checking AI availability...</span>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tabs">
+            <button class="tab active" type="button" onclick="switchTab('summarize')">
+                📄 <span>Smart Summarizer</span>
+            </button>
+            <button class="tab" type="button" onclick="switchTab('write')">
+                ✏️ <span>Note Writer</span>
+            </button>
+            <button class="tab" type="button" onclick="switchTab('translate')">
+                🌐 <span>Translator</span>
+            </button>
+            <button class="tab" type="button" onclick="switchTab('proofread')">
+                🖊️ <span>Proofreader</span>
+            </button>
+        </div>
+
+        <!-- Smart Summarizer Tab -->
+        <section id="summarize" class="tab-content active">
+            <div class="feature-header">
+                <h2>📄 Smart Summarizer</h2>
+                <p class="description">Upload PDF/TXT files or paste text to get intelligent summaries</p>
+            </div>
+
+            <div class="upload-section">
+                <div class="upload-area" id="uploadArea" onclick="document.getElementById('fileInput').click()">
+                    <div class="upload-icon">📁</div>
+                    <p class="upload-text">Drop PDF or TXT file here</p>
+                    <p class="upload-subtext">(Max 10MB, 50 pages)</p>
+                    <input type="file" id="fileInput" accept=".pdf,.txt" hidden>
+                </div>
+                <div id="fileInfo" class="file-info hidden">
+                    <span id="fileName"></span>
+                    <button class="btn-clear" type="button" onclick="clearFile()">✕</button>
+                </div>
+            </div>
+
+            <div class="divider"><span>OR</span></div>
+
+            <textarea id="summarizeInput" placeholder="Paste your text here (articles, lecture notes, research papers...)"></textarea>
+            
+            <div class="options-grid">
+                <div class="option-group">
+                    <label for="summaryType">Summary Type</label>
+                    <select id="summaryType">
+                        <option value="key-points">📌 Key Points</option>
+                        <option value="tl;dr">⚡ TL;DR</option>
+                        <option value="teaser">💡 Teaser</option>
+                        <option value="headline">📰 Headline</option>
+                    </select>
+                </div>
+                <div class="option-group">
+                    <label for="summaryLength">Length</label>
+                    <select id="summaryLength">
+                        <option value="short">Short</option>
+                        <option value="medium" selected>Medium</option>
+                        <option value="long">Long</option>
+                    </select>
+                </div>
+                <div class="option-group">
+                    <label for="summaryFormat">Format</label>
+                    <select id="summaryFormat">
+                        <option value="paragraph">Paragraph</option>
+                        <option value="bullets">Bullet Points</option>
+                    </select>
+                </div>
+            </div>
+
+            <button class="btn btn-primary" type="button" onclick="summarizeText()">
+                ✨ Generate Summary
+            </button>
+            
+            <div id="summarizeOutput" class="output"></div>
+        </section>
+
+        <!-- Note Writer Tab -->
+        <section id="write" class="tab-content">
+            <div class="feature-header">
+                <h2>✏️ Professional Note Writer</h2>
+                <p class="description">Generate comprehensive study notes with AI assistance</p>
+            </div>
+
+            <div class="input-enhanced">
+                <label for="writeInput" class="input-label">Topic or Prompt</label>
+                <input type="text" id="writeInput" placeholder="e.g., Explain quantum mechanics in simple terms">
+            </div>
+
+            <div class="input-enhanced">
+                <label for="writeContext" class="input-label">Additional Context (Optional)</label>
+                <textarea id="writeContext" rows="3" placeholder="Add any specific points, concepts, or details you want to include..."></textarea>
+            </div>
+
+            <div class="options-grid">
+                <div class="option-group">
+                    <label for="writeTone">Writing Style</label>
+                    <select id="writeTone">
+                        <option value="academic">🎓 Academic</option>
+                        <option value="professional">💼 Professional</option>
+                        <option value="casual">😊 Casual</option>
+                        <option value="detailed">📚 Detailed</option>
+                    </select>
+                </div>
+                <div class="option-group">
+                    <label for="writeLength">Note Length</label>
+                    <select id="writeLength">
+                        <option value="short">Brief (1 paragraph)</option>
+                        <option value="medium" selected>Standard (2-3 paragraphs)</option>
+                        <option value="long">Comprehensive (4+ paragraphs)</option>
+                    </select>
+                </div>
+                <div class="option-group">
+                    <label for="writeStructure">Structure</label>
+                    <select id="writeStructure">
+                        <option value="intro-body-conclusion">Intro → Body → Conclusion</option>
+                        <option value="point-by-point">Point by Point</option>
+                        <option value="problem-solution">Problem → Solution</option>
+                    </select>
+                </div>
+            </div>
+
+            <button class="btn btn-primary" type="button" onclick="writeNotes()">
+                ✨ Generate Professional Notes
+            </button>
+            
+            <div id="writeOutput" class="output"></div>
+            <div id="writeActions" class="action-buttons hidden">
+                <button class="btn-secondary" type="button" onclick="copyToClipboard('writeOutput')">📋 Copy</button>
+                <button class="btn-secondary" type="button" onclick="expandNotes()">➕ Expand</button>
+                <button class="btn-secondary" type="button" onclick="regenerateNotes()">🔄 Regenerate</button>
+            </div>
+        </section>
+
+        <!-- Translator Tab -->
+        <section id="translate" class="tab-content">
+            <div class="feature-header">
+                <h2>🌐 Multi-Language Translator</h2>
+                <p class="description">Break language barriers with instant AI translation</p>
+            </div>
+
+            <textarea id="translateInput" placeholder="Enter text to translate..."></textarea>
+            
+            <div class="options-grid">
+                <div class="option-group">
+                    <label for="sourceLanguage">Source Language</label>
+                    <select id="sourceLanguage">
+                        <option value="en" selected>English</option>
+                        <option value="es">Spanish</option>
+                        <option value="fr">French</option>
+                        <option value="de">German</option>
+                        <option value="zh">Chinese</option>
+                        <option value="ja">Japanese</option>
+                        <option value="hi">Hindi</option>
+                        <option value="ar">Arabic</option>
+                    </select>
+                </div>
+                <div class="option-group">
+                    <label for="targetLanguage">Target Language</label>
+                    <select id="targetLanguage">
+                        <option value="es">Spanish</option>
+                        <option value="fr">French</option>
+                        <option value="de">German</option>
+                        <option value="zh">Chinese</option>
+                        <option value="ja">Japanese</option>
+                        <option value="hi">Hindi</option>
+                        <option value="ar">Arabic</option>
+                        <option value="en">English</option>
+                    </select>
+                </div>
+            </div>
+
+            <button class="btn btn-primary" type="button" onclick="translateText()">
+                🌍 Translate
+            </button>
+            
+            <div id="translateOutput" class="output"></div>
+        </section>
+
+        <!-- Proofreader Tab -->
+        <section id="proofread" class="tab-content">
+            <div class="feature-header">
+                <h2>🖊️ Grammar Proofreader</h2>
+                <p class="description">Perfect your essays with AI-powered grammar checking</p>
+            </div>
+
+            <textarea id="proofreadInput" placeholder="Paste your essay, assignment, or any text..."></textarea>
+            
+            <div class="options-grid">
+                <div class="option-group">
+                    <label for="proofreadType">Check Type</label>
+                    <select id="proofreadType">
+                        <option value="comprehensive">Comprehensive (Grammar + Spelling)</option>
+                        <option value="grammar">Grammar Only</option>
+                        <option value="spelling">Spelling Only</option>
+                    </select>
+                </div>
+                <div class="option-group">
+                    <label for="proofreadFormat">Output Format</label>
+                    <select id="proofreadFormat">
+                        <option value="corrected">Show Corrected Text</option>
+                        <option value="suggestions">Show Suggestions</option>
+                    </select>
+                </div>
+            </div>
+
+            <button class="btn btn-primary" type="button" onclick="proofreadText()">
+                ✓ Check Grammar
+            </button>
+            
+            <div id="proofreadOutput" class="output"></div>
+        </section>
+
+        <!-- Footer -->
+        <footer>
+            <div class="footer-content">
+                <p class="footer-title">Built for Google Chrome Built-in AI Challenge 2025</p>
+                <p class="footer-apis">APIs Used: Summarizer • Writer • Translator • Prompt API</p>
+                <p class="footer-tech">Tech Stack: Python Flask • HTML • CSS • JavaScript • Gemini Nano</p>
+            </div>
+        </footer>
+    </div>
+
+    <script src="/static/app.js"></script>
+</body>
+</html>

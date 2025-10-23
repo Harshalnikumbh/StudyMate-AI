@@ -1,62 +1,30 @@
 // Global variables
-let aiCapabilities = {
-    summarizer: false,
-    writer: false,
-    translator: false,
-    proofreader: false
-};
-
 let currentFileText = '';
 let lastGeneratedNotes = '';
 
 // Initialize on page load
 window.addEventListener('load', () => {
-    checkAIAvailability();
+    checkAPIStatus();
     setupFileUpload();
 });
 
-// Check AI availability
-async function checkAIAvailability() {
+// Check API Status
+async function checkAPIStatus() {
     const statusBanner = document.getElementById('statusBanner');
     const statusText = document.getElementById('statusText');
     
     try {
-        // Check Summarizer API
-        if (window.ai && window.ai.summarizer) {
-            const available = await window.ai.summarizer.capabilities();
-            aiCapabilities.summarizer = available.available === 'readily';
-        }
-        
-        // Check Writer API
-        if (window.ai && window.ai.writer) {
-            const available = await window.ai.writer.capabilities();
-            aiCapabilities.writer = available.available === 'readily';
-        }
-        
-        // Check Translator API
-        if (window.ai && window.ai.translator) {
-            const available = await window.ai.translator.capabilities();
-            aiCapabilities.translator = available.available === 'readily';
-        }
-        
-        // Check Proofreader API (using languageModel)
-        if (window.ai && window.ai.languageModel) {
-            const available = await window.ai.languageModel.capabilities();
-            aiCapabilities.proofreader = available.available === 'readily';
-        }
-        
-        const availableCount = Object.values(aiCapabilities).filter(v => v).length;
-        
-        if (availableCount > 0) {
+        // Ping the backend to check if it's running
+        const response = await fetch('/');
+        if (response.ok) {
             statusBanner.className = 'status-banner success';
-            statusText.textContent = `✅ Chrome AI Ready! ${availableCount}/4 APIs available`;
+            statusText.textContent = '✅ StudyMate-AI Ready! Powered by Google Gemini';
         } else {
-            statusBanner.className = 'status-banner error';
-            statusText.textContent = '⚠️ Chrome AI not available. Please use Chrome Canary/Dev with AI enabled.';
+            throw new Error('Backend not responding');
         }
     } catch (error) {
         statusBanner.className = 'status-banner error';
-        statusText.textContent = '⚠️ Chrome AI not available. Please use Chrome Canary/Dev 127+ with flags enabled.';
+        statusText.textContent = '⚠️ Backend server not available. Please start the Flask server.';
     }
 }
 
@@ -183,40 +151,32 @@ async function summarizeText() {
         return;
     }
     
-    // CPU-friendly: Limit text length
-    const maxChars = 50000;
-    const textToSummarize = input.length > maxChars ? input.substring(0, maxChars) : input;
-    
-    if (input.length > maxChars) {
-        showError(output, `Text truncated to ${maxChars} characters for CPU efficiency. Processing...`);
-        await new Promise(resolve => setTimeout(resolve, 2000));
-    }
-    
     showLoading(output);
     
     try {
-        if (!window.ai || !window.ai.summarizer) {
-            throw new Error('Summarizer API not available');
-        }
-        
-        const summarizer = await window.ai.summarizer.create({
-            type: type,
-            length: length
+        const response = await fetch('/api/summarize', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                text: input,
+                type: type,
+                length: length,
+                format: format
+            })
         });
         
-        let summary = await summarizer.summarize(textToSummarize);
+        const result = await response.json();
         
-        // Format as bullets if requested
-        if (format === 'bullets' && !summary.includes('•') && !summary.includes('-')) {
-            const sentences = summary.split(/[.!?]+/).filter(s => s.trim());
-            summary = sentences.map(s => `• ${s.trim()}`).join('\n');
+        if (result.success) {
+            showResult(output, result.summary);
+        } else {
+            throw new Error(result.error);
         }
         
-        showResult(output, summary);
-        summarizer.destroy();
-        
     } catch (error) {
-        showError(output, `Error: ${error.message}. Ensure Chrome AI is enabled.`);
+        showError(output, `Error: ${error.message}`);
     }
 }
 
@@ -237,49 +197,32 @@ async function writeNotes() {
     showLoading(output);
     
     try {
-        if (!window.ai || !window.ai.writer) {
-            throw new Error('Writer API not available');
-        }
-        
-        // Build enhanced prompt based on structure
-        let enhancedPrompt = input;
-        
-        if (context.trim()) {
-            enhancedPrompt += `\n\nAdditional context: ${context}`;
-        }
-        
-        // Add structure guidance
-        const structureGuides = {
-            'intro-body-conclusion': '\n\nStructure: Start with an introduction, develop the main body with key points, and conclude with a summary.',
-            'point-by-point': '\n\nStructure: Present information as clear, organized points with explanations.',
-            'problem-solution': '\n\nStructure: Define the problem first, then present solutions and their benefits.'
-        };
-        
-        enhancedPrompt += structureGuides[structure] || '';
-        
-        // Map tone to writer API options
-        const toneMap = {
-            'academic': 'formal',
-            'professional': 'formal',
-            'casual': 'casual',
-            'detailed': 'formal'
-        };
-        
-        const writer = await window.ai.writer.create({
-            tone: toneMap[tone] || 'neutral',
-            length: length
+        const response = await fetch('/api/write', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                topic: input,
+                context: context,
+                tone: tone,
+                length: length,
+                structure: structure
+            })
         });
         
-        const notes = await writer.write(enhancedPrompt);
-        lastGeneratedNotes = notes;
+        const result = await response.json();
         
-        showResult(output, notes);
-        document.getElementById('writeActions').classList.remove('hidden');
-        
-        writer.destroy();
+        if (result.success) {
+            lastGeneratedNotes = result.notes;
+            showResult(output, result.notes);
+            document.getElementById('writeActions').classList.remove('hidden');
+        } else {
+            throw new Error(result.error);
+        }
         
     } catch (error) {
-        showError(output, `Error: ${error.message}. Ensure Chrome AI is enabled.`);
+        showError(output, `Error: ${error.message}`);
     }
 }
 
@@ -293,20 +236,25 @@ async function expandNotes() {
     showLoading(output);
     
     try {
-        if (!window.ai || !window.ai.writer) {
-            throw new Error('Writer API not available');
-        }
-        
-        const writer = await window.ai.writer.create({
-            tone: 'formal',
-            length: 'long'
+        const response = await fetch('/api/expand', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                topic: input,
+                notes: lastGeneratedNotes
+            })
         });
         
-        const expandedNotes = await writer.write(`Expand and elaborate on this: "${input}"\n\nCurrent notes: ${lastGeneratedNotes}\n\nAdd more details, examples, and explanations.`);
-        lastGeneratedNotes = expandedNotes;
+        const result = await response.json();
         
-        showResult(output, expandedNotes);
-        writer.destroy();
+        if (result.success) {
+            lastGeneratedNotes = result.notes;
+            showResult(output, result.notes);
+        } else {
+            throw new Error(result.error);
+        }
         
     } catch (error) {
         showError(output, `Error: ${error.message}`);
@@ -355,31 +303,28 @@ async function translateText() {
     showLoading(output);
     
     try {
-        if (!window.ai || !window.ai.translator) {
-            throw new Error('Translator API not available');
-        }
-        
-        const canTranslate = await window.ai.translator.canTranslate({
-            sourceLanguage: sourceLang,
-            targetLanguage: targetLang
+        const response = await fetch('/api/translate', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                text: input,
+                source: sourceLang,
+                target: targetLang
+            })
         });
         
-        if (canTranslate === 'no') {
-            throw new Error('Translation not available for selected language pair');
+        const result = await response.json();
+        
+        if (result.success) {
+            showResult(output, result.translation);
+        } else {
+            throw new Error(result.error);
         }
-        
-        const translator = await window.ai.translator.create({
-            sourceLanguage: sourceLang,
-            targetLanguage: targetLang
-        });
-        
-        const translation = await translator.translate(input);
-        showResult(output, translation);
-        
-        translator.destroy();
         
     } catch (error) {
-        showError(output, `Error: ${error.message}. Try different language pair.`);
+        showError(output, `Error: ${error.message}`);
     }
 }
 
@@ -398,49 +343,35 @@ async function proofreadText() {
     showLoading(output);
     
     try {
-        if (!window.ai || !window.ai.languageModel) {
-            throw new Error('Proofreader API not available');
-        }
-        
-        // Build prompt based on check type
-        let prompt = '';
-        
-        if (format === 'corrected') {
-            if (checkType === 'comprehensive') {
-                prompt = `Proofread and correct all grammar and spelling errors in this text. Return only the corrected text:\n\n"${input}"`;
-            } else if (checkType === 'grammar') {
-                prompt = `Fix only grammar errors in this text. Return the corrected text:\n\n"${input}"`;
-            } else {
-                prompt = `Fix only spelling errors in this text. Return the corrected text:\n\n"${input}"`;
-            }
-        } else {
-            if (checkType === 'comprehensive') {
-                prompt = `Review this text and provide a list of grammar and spelling corrections needed:\n\n"${input}"`;
-            } else if (checkType === 'grammar') {
-                prompt = `Review this text and list grammar errors found:\n\n"${input}"`;
-            } else {
-                prompt = `Review this text and list spelling errors found:\n\n"${input}"`;
-            }
-        }
-        
-        const session = await window.ai.languageModel.create({
-            systemPrompt: 'You are an expert grammar and spelling checker. Be precise and helpful.'
+        const response = await fetch('/api/proofread', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                text: input,
+                type: checkType,
+                format: format
+            })
         });
         
-        const result = await session.prompt(prompt);
-        showResult(output, result);
+        const result = await response.json();
         
-        session.destroy();
+        if (result.success) {
+            showResult(output, result.result);
+        } else {
+            throw new Error(result.error);
+        }
         
     } catch (error) {
-        showError(output, `Error: ${error.message}. Ensure Chrome AI is enabled.`);
+        showError(output, `Error: ${error.message}`);
     }
 }
 
 // Helper Functions
 function showLoading(element) {
     element.className = 'output visible loading';
-    element.textContent = '⏳ Processing with AI...';
+    element.textContent = '⏳ Processing with Gemini AI...';
 }
 
 function showResult(element, text) {

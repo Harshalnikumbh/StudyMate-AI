@@ -301,13 +301,12 @@ if __name__ == '__main__':
     print("🌐 Translation: Google Translator (Free)")
     print("="*60)
     
-    if GEMINI_API_KEY == 'AIzaSyDNS9qY5zSbKBdRbKKzJa4kB7vIX2uq20A':
+    # Check if API key is the default placeholder
+    if GEMINI_API_KEY == 'YOUR_GEMINI_API_KEY_HERE' or not GEMINI_API_KEY:
         print("\n⚠️  WARNING: GEMINI_API_KEY NOT SET!")
-        print("📝 Steps to get started:")
-        print(" Replace 'YOUR_GEMINI_API_KEY_HERE' in this file (line 16)")
         print("="*60 + "\n")
     else:
-        print("✅ API Key configured!")
+        print(f"✅ API Key configured! (Key: {GEMINI_API_KEY[:20]}...)")
         print("="*60 + "\n")
     
     app.run(debug=True, host='0.0.0.0', port=5000)

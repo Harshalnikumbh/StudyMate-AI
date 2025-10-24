@@ -5,17 +5,253 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>StudyMate-AI - Chrome AI Challenge 2025</title>
 
-    <!-- Font Awesome -->
+    <!-- Font Awesome - UPDATED VERSION -->
     <link
       rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
-      integrity="sha512-KNUX6JjO3ezlHtrFv1Yq6JcCJKP3SULj9c6YcZ+vvWcI4nSgHtAiI0zG0xOBF7MIg2OfZghkKlfRywZ13dC9VA=="
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+      integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA=="
       crossorigin="anonymous"
       referrerpolicy="no-referrer"
     />
 
     <!-- Stylesheet -->
     <link rel="stylesheet" href="/static/style.css" />
+    
+    <!-- Additional CSS to ensure icons display -->
+    <style>
+      /* Base styles */
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        padding: 0;
+        overflow-x: hidden;
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+
+      /* Footer styles */
+      footer {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 4rem 2rem 2.5rem;
+        text-align: center;
+        margin-top: 5rem;
+        width: 100%;
+      }
+
+      .footer-content {
+        max-width: 900px;
+        margin: 0 auto;
+      }
+
+      .footer-title {
+        font-size: 2.8rem;
+        font-weight: 800;
+        margin-bottom: 1rem;
+        letter-spacing: 1px;
+        text-shadow: none;
+        color: #ffffff !important;
+        opacity: 1 !important;
+        filter: none !important;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      .footer-description {
+        font-size: 1.2rem;
+        margin-bottom: 2.5rem;
+        opacity: 1 !important;
+        font-weight: 500;
+        letter-spacing: 0.5px;
+        color: #ffffff !important;
+        filter: none !important;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      .footer-socials {
+        display: flex;
+        justify-content: center;
+        gap: 2rem;
+        margin-bottom: 2.5rem;
+        flex-wrap: wrap;
+      }
+
+      .social-link {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 60px;
+        height: 60px;
+        background: rgba(255, 255, 255, 0.15);
+        border-radius: 50% !important;
+        color: white;
+        font-size: 1.7rem;
+        text-decoration: none;
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        backdrop-filter: blur(10px);
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        overflow: hidden;
+      }
+
+      .social-link:hover {
+        background: rgba(255, 255, 255, 0.25);
+        transform: translateY(-8px) scale(1.15);
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+        border-color: rgba(255, 255, 255, 0.5);
+        border-radius: 50% !important;
+      }
+
+      .social-link i {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        line-height: 1;
+      }
+
+      .footer-copyright {
+        font-size: 1rem;
+        opacity: 1 !important;
+        margin-top: 2.5rem;
+        padding-top: 2rem;
+        border-top: 2px solid rgba(255, 255, 255, 0.5);
+        font-weight: 500;
+        letter-spacing: 0.5px;
+        color: #ffffff !important;
+        filter: none !important;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      /* Mobile Responsive Styles */
+      @media (max-width: 768px) {
+        .container {
+          padding: 15px;
+        }
+
+        footer {
+          padding: 3rem 1.5rem 2rem;
+          margin-top: 3rem;
+        }
+
+        .footer-title {
+          font-size: 1.8rem;
+        }
+
+        .footer-description {
+          font-size: 1rem;
+          margin-bottom: 2rem;
+        }
+
+        .footer-socials {
+          gap: 1.5rem;
+        }
+
+        .social-link {
+          width: 50px;
+          height: 50px;
+          font-size: 1.4rem;
+        }
+
+        .footer-copyright {
+          font-size: 0.9rem;
+        }
+
+        /* Tab adjustments */
+        .tabs {
+          flex-wrap: wrap;
+          gap: 10px;
+        }
+
+        .tab {
+          flex: 1 1 calc(50% - 10px);
+          min-width: 140px;
+          padding: 12px 8px;
+          font-size: 0.85rem;
+        }
+
+        /* Input and textarea adjustments */
+        textarea,
+        input[type="text"] {
+          font-size: 16px !important; /* Prevent zoom on iOS */
+          width: 100%;
+        }
+
+        /* Options grid */
+        .options-grid {
+          grid-template-columns: 1fr;
+          gap: 15px;
+        }
+
+        /* Buttons */
+        .btn {
+          width: 100%;
+          font-size: 1rem;
+          padding: 14px 20px;
+        }
+
+        /* Header */
+        header h1 {
+          font-size: 1.8rem;
+        }
+
+        header .subtitle {
+          font-size: 0.9rem;
+        }
+
+        /* Upload area */
+        .upload-area {
+          padding: 30px 20px;
+        }
+
+        .upload-icon {
+          font-size: 3rem;
+        }
+
+        /* Output sections */
+        .output {
+          font-size: 0.95rem;
+          padding: 15px;
+        }
+      }
+
+      @media (max-width: 480px) {
+        .container {
+          padding: 10px;
+        }
+
+        .footer-title {
+          font-size: 1.5rem;
+        }
+
+        .footer-description {
+          font-size: 0.9rem;
+        }
+
+        .social-link {
+          width: 45px;
+          height: 45px;
+          font-size: 1.2rem;
+        }
+
+        .tab {
+          flex: 1 1 100%;
+          font-size: 0.9rem;
+        }
+
+        header h1 {
+          font-size: 1.5rem;
+        }
+
+        .feature-header h2 {
+          font-size: 1.4rem;
+        }
+      }
+    </style>
   </head>
   <body>
     <div class="container">

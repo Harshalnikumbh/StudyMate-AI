@@ -14,19 +14,19 @@ MAX_FILE_SIZE = 10 * 1024 * 1024  # 10MB
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['MAX_CONTENT_LENGTH'] = MAX_FILE_SIZE
 
-GEMINI_API_KEY = 'AIzaSyDNS9qY5zSbKBdRbKKzJa4kB7vIX2uq20A'
+GEMINI_API_KEY = 'AIzaSyDRv4lCHDLyHdhUTL3_Q-e-w7mSI_Ijk90'
 
 # Initialize Gemini AI
 genai.configure(api_key=GEMINI_API_KEY)
-model = genai.GenerativeModel('gemini-pro')
+model = genai.GenerativeModel('gemini-2.0-flash')
 
 # Create necessary directories
-if not os.path.exists('templates'):
-    os.makedirs('templates')
-if not os.path.exists('static/css'):
-    os.makedirs('static/css')
-if not os.path.exists('static/js'):
-    os.makedirs('static/js')
+# if not os.path.exists('templates'):
+#     os.makedirs('templates')
+# if not os.path.exists('static/css'):
+#     os.makedirs('static/css')
+# if not os.path.exists('static/js'):
+#     os.makedirs('static/js')
 if not os.path.exists(UPLOAD_FOLDER):
     os.makedirs(UPLOAD_FOLDER)
 

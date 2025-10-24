@@ -267,7 +267,7 @@ function regenerateNotes() {
 }
 
 // Copy to Clipboard
-function copyToClipboard(outputId) {
+function copyToClipboard(outputId,event) {
     const output = document.getElementById(outputId);
     const text = output.textContent;
     

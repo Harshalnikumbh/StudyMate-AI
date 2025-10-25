@@ -1,5 +1,6 @@
 Flask==3.0.0
 PyPDF2==3.0.1
-Werkzeug==3.0.1
 google-generativeai==0.3.2
 deep-translator==1.11.4
+gunicorn==21.2.0
+werkzeug==3.0.1

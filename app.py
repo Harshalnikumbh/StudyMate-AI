@@ -294,19 +294,5 @@ def send_static(path):
     return send_from_directory('static', path)
 
 if __name__ == '__main__':
-    print("\n" + "="*60)
-    print("🚀 StudyMate-AI (Cloud API Version) Starting...")
-    print("="*60)
-    print("📚 AI Backend: Google Gemini Pro")
-    print("🌐 Translation: Google Translator (Free)")
-    print("="*60)
-    
-    # Check if API key is the default placeholder
-    if GEMINI_API_KEY == 'YOUR_GEMINI_API_KEY_HERE' or not GEMINI_API_KEY:
-        print("\n⚠️  WARNING: GEMINI_API_KEY NOT SET!")
-        print("="*60 + "\n")
-    else:
-        print(f"✅ API Key configured! (Key: {GEMINI_API_KEY[:20]}...)")
-        print("="*60 + "\n")
-    
-    app.run(debug=True, host='0.0.0.0', port=5000)
+     port = int(os.environ.get('PORT', 5000))
+     app.run(debug=False, host='0.0.0.0', port=port)

@@ -14,7 +14,7 @@ MAX_FILE_SIZE = 10 * 1024 * 1024  # 10MB
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['MAX_CONTENT_LENGTH'] = MAX_FILE_SIZE
 
-GEMINI_API_KEY = 'AIzaSyDRv4lCHDLyHdhUTL3_Q-e-w7mSI_Ijk90'
+GEMINI_API_KEY = os.environ.get('GEMINI_API_KEY')
 
 # Initialize Gemini AI
 genai.configure(api_key=GEMINI_API_KEY)
